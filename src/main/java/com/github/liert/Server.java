@@ -7,26 +7,20 @@ import java.net.Socket;
 
 public class Server {
     public static ServerSocket socket = null;
-    private static boolean status = false;
     private final int port;
     Server(int port) {
         this.port = port;
     }
-    public static boolean getStatus() {
-        return Server.status;
-    }
     public void connect() {
         Thread thread = new Thread(new PortListener(port));
         thread.start();
-        Server.status = true;
-        Manage.sendMessage(Manage.format("Develop", "正在建立监听[" + port + "]..."));
+        Manage.sendMessage(Manage.format("Develop", "正在监听[" + port + "]..."));
     }
     static class PortListener implements Runnable {
         private final int port;
         PortListener(int port) {
             this.port = port;
         }
-
         @Override
         public void run() {
             try (ServerSocket serverSocket = new ServerSocket(this.port)) {
@@ -36,7 +30,7 @@ public class Server {
                     handleClient(clientSocket);
                 }
             } catch (IOException e) {
-                Manage.sendMessage(Manage.format("Develop", "连接建立失败..."));
+                Manage.sendMessage(Manage.format("Develop", "连接断开!"));
                 e.printStackTrace();
             }
         }
@@ -52,7 +46,6 @@ public class Server {
         while ((bytesRead = inputStream.read(buffer)) != -1) {
             message.append(new String(buffer, 0, bytesRead));
         }
-
         Manage.sendMessage("正在执行: " + message);
         String msg = "/" + message;
         Manage.exec(msg);
@@ -63,8 +56,7 @@ public class Server {
         if (Server.socket != null) {
             try {
                 Server.socket.close();
-                Manage.sendMessage("关闭监听");
-                Server.status = true;
+                Manage.sendMessage(Manage.format("Develop", "监听断开."));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
