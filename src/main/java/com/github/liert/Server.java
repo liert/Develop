@@ -7,15 +7,19 @@ import java.net.Socket;
 
 public class Server {
     public static ServerSocket socket = null;
+    private static boolean status = false;
     private final int port;
-
     Server(int port) {
         this.port = port;
+    }
+    public static boolean getStatus() {
+        return Server.status;
     }
     public void connect() {
         Thread thread = new Thread(new PortListener(port));
         thread.start();
-        Develop.p.sendMessage("正在监听 " + port + " 端口");
+        Server.status = true;
+        Manage.sendMessage(Manage.format("Develop", "正在建立监听[" + port + "]..."));
     }
     static class PortListener implements Runnable {
         private final int port;
@@ -32,7 +36,7 @@ public class Server {
                     handleClient(clientSocket);
                 }
             } catch (IOException e) {
-                Develop.p.sendMessage("连接建立失败...");
+                Manage.sendMessage(Manage.format("Develop", "连接建立失败..."));
                 e.printStackTrace();
             }
         }
@@ -49,8 +53,9 @@ public class Server {
             message.append(new String(buffer, 0, bytesRead));
         }
 
-        Develop.p.sendMessage("正在执行: " + message);
-        Develop.p.chat("/" + message);
+        Manage.sendMessage("正在执行: " + message);
+        String msg = "/" + message;
+        Manage.exec(msg);
         // 关闭连接
         clientSocket.close();
     }
@@ -58,7 +63,8 @@ public class Server {
         if (Server.socket != null) {
             try {
                 Server.socket.close();
-                Develop.p.sendMessage("关闭监听");
+                Manage.sendMessage("关闭监听");
+                Server.status = true;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
