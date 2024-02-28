@@ -14,6 +14,8 @@ public final class Develop extends JavaPlugin {
         super.onEnable();
         Develop.develop = this;
         this.saveDefaultConfig();
+        Manage manage = new Manage();
+        manage.initPlugin();
         this.flag = this.getConfig().getBoolean("AutoListener");
         if (this.flag) {
             int port = this.getConfig().getInt("Port");
