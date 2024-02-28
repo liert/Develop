@@ -47,8 +47,7 @@ public class Server {
             message.append(new String(buffer, 0, bytesRead));
         }
         Manage.sendMessage("正在执行: " + message);
-        String msg = "/" + message;
-        Manage.exec(msg);
+        Manage.exec(String.valueOf(message));
         // 关闭连接
         clientSocket.close();
     }
