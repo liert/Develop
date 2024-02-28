@@ -19,11 +19,11 @@ public class Commands implements CommandExecutor {
         }
         if (args[0].equals("port") && args.length == 2) {
             if (!(commandSender instanceof Player)) {
-                Manage.sendMessage(commandSender, Manage.format("Develop", "非玩家禁止此使用命令."));
+                Manage.sendMessage(commandSender, Manage.format("Develop", "非玩家禁止此命令."));
                 return true;
             }
             if (Develop.getInstance().getConfig().getBoolean("AutoListener")) {
-                Manage.sendMessage(commandSender, Manage.format("Develop", "AutoListener 模式禁止此使用命令."));
+                Manage.sendMessage(commandSender, Manage.format("Develop", "AutoListener 模式禁止此命令."));
                 return true;
             }
             Develop.p = (Player) commandSender;

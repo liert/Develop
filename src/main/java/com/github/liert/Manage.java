@@ -30,7 +30,7 @@ public class Manage {
         if (Develop.getInstance().flag) {
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), msg);
         } else {
-            Develop.p.chat("/" + msg);
+            Develop.p.chat(msg);
         }
     }
 }
