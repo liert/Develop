@@ -18,7 +18,7 @@ public class Commands implements CommandExecutor {
         if (args.length < 1) {
             Manage.sendMessage(commandSender, "/develop port <number>");
             Manage.sendMessage(commandSender, "/develop stop");
-            Manage.sendMessage(commandSender, "/develop plugin list");
+            Manage.sendMessage(commandSender, "/develop plugins");
             Manage.sendMessage(commandSender, "/develop unload pluginName");
             Manage.sendMessage(commandSender, "/develop load pluginName");
             return true;
@@ -48,18 +48,18 @@ public class Commands implements CommandExecutor {
                 return true;
             }
             Plugin plugin = Bukkit.getPluginManager().getPlugin(args[1]);
-            Manage.sendMessage(commandSender, Manage.unload(plugin));
+            Manage.sendMessage(commandSender, Manage.onLoad(plugin));
             return true;
         }
         if (args[0].equals("load") && args.length == 2) {
-            if (!Manage.isunLoadPlugin(args[1])) {
+            if (!Manage.isUnLoadPlugin(args[1])) {
                 Manage.sendMessage(commandSender, Manage.format("Develop", args[1] + " 未找到."));
                 return true;
             }
-            Manage.sendMessage(commandSender, Manage.format("Develop", Manage.load(args[1])));
+            Manage.sendMessage(commandSender, Manage.load(args[1]));
             return true;
         }
-        if (args[0].equals("plugin") && args[1].equals("list")) {
+        if (args[0].equals("plugins") && args.length == 1) {
             Manage.sendMessage(commandSender, Manage.format("Develop", Manage.getPlugins()));
             return true;
         }

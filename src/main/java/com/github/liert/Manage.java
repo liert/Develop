@@ -5,10 +5,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.InvalidDescriptionException;
-import org.bukkit.plugin.InvalidPluginException;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +15,7 @@ import java.util.*;
 
 public class Manage {
     private static final HashMap<String, File> plugins = new HashMap<>();
+    private static final HashMap<String, File> unLoadPlugins = new HashMap<>();
     public static String format(String title, String msg) {
         return "§7[§a" + title + "§7]§a " + msg;
     }
@@ -43,13 +41,30 @@ public class Manage {
         if (Develop.getInstance().flag) {
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), msg);
         } else {
-            Develop.p.chat(msg);
+            Develop.p.chat("/" + msg);
         }
     }
     public void initPlugin() {
-        Plugin[] plugins = Bukkit.getPluginManager().getPlugins();
-        for (Plugin plugin: plugins) {
-            Manage.plugins.put(plugin.getName(), plugin.getDataFolder());
+        File pluginDir = new File("plugins");
+        if (!pluginDir.isDirectory()) {
+            Manage.sendMessage(Manage.format("Develop", "plugins 文件夹未找到."));
+            return;
+        }
+        File[] pluginList = pluginDir.listFiles();
+        if (pluginList == null) {
+            Manage.sendMessage(Manage.format("Develop", "plugins 文件夹初始化失败."));
+            return;
+        }
+        for (File file : pluginList) {
+            if (file.getName().endsWith(".jar")) {
+                try {
+                    PluginDescriptionFile desc = Develop.getInstance().getPluginLoader().getPluginDescription(file);
+                    Manage.plugins.put(desc.getName(), file);
+                } catch (InvalidDescriptionException e) {
+                    Manage.sendMessage(Manage.format("Develop", "plugins 文件夹初始化失败."));
+                    return;
+                }
+            }
         }
     }
     public static String getPlugins() {
@@ -59,24 +74,29 @@ public class Manage {
         }
         return list.toString();
     }
-    public static File getPlugin(String name) {
-        return Manage.plugins.get(name);
+//    public static File getPlugin(String name) {
+//        return Manage.plugins.get(name);
+//    }
+    public static File getunLoadPlugin(String name) {
+        return Manage.unLoadPlugins.get(name);
     }
-    public static boolean isunLoadPlugin(String name) {
-        return Manage.plugins.containsKey(name);
+    public static boolean isUnLoadPlugin(String name) {
+        return Manage.unLoadPlugins.containsKey(name);
     }
     public static String load(String name) {
         try {
-            Plugin plugin = Bukkit.getPluginManager().loadPlugin(Manage.getPlugin(name));
+            Plugin plugin = Bukkit.getPluginManager().loadPlugin(Manage.getunLoadPlugin(name));
             plugin.onLoad();
             Bukkit.getPluginManager().enablePlugin(plugin);
+            Manage.plugins.put(name, Manage.unLoadPlugins.get(name));
+            Manage.unLoadPlugins.remove(name);
         } catch (InvalidDescriptionException | InvalidPluginException e) {
             e.printStackTrace();
             return Manage.format("Develop", name + " 加载失败.");
         }
         return Manage.format("Develop", name + " 加载成功.");
     }
-    public static String unload(Plugin plugin) {
+    public static String onLoad(Plugin plugin) {
         PluginManager pluginManager = Bukkit.getPluginManager();
         String name = plugin.getName();
         List<?> plugins;
@@ -136,6 +156,8 @@ public class Manage {
                 e.printStackTrace();
             }
         }
+        unLoadPlugins.put(name, Manage.plugins.get(name));
+        Manage.plugins.remove(name);
         System.gc();
         return Manage.format("Develop", name + " 卸载成功.");
     }

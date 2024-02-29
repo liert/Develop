@@ -2,8 +2,7 @@ name: Develop
 author: liert
 version: '${project.version}'
 main: com.github.liert.Develop
-depend: [PlugMan]
 description: This is a Minecraft plugin development assistant plugin.
 commands:
   develop:
-    description: "/develop port 8888"
+    description: "/develop"
